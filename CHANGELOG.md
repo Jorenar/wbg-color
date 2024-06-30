@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * old Git tags
 * old .gitignore
 * handling of images
+* old PKGBUILD
 
 ## [wbg]
 
