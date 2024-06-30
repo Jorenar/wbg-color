@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * meson.build
 * old Git tags
 * old .gitignore
+* handling of images
 
 ## [wbg]
 

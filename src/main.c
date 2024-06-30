@@ -24,22 +24,6 @@
 #include "shm.h"
 #include "version.h"
 
-#if defined(WBG_HAVE_PNG)
- #include "png-wbg.h"
-#endif
-#if defined(WBG_HAVE_JPG)
- #include "jpg.h"
-#endif
-#if defined(WBG_HAVE_WEBP)
- #include "webp.h"
-#endif
-#if defined(WBG_HAVE_SVG)
- #include "svg.h"
-#endif
-#if defined(WBG_HAVE_JXL)
- #include "jxl.h"
-#endif
-
 /* Top-level globals */
 static struct wl_display *display;
 static struct wl_registry *registry;
@@ -406,26 +390,6 @@ main(int argc, const char *const *argv)
         return EXIT_FAILURE;
     }
 
-#if defined(WBG_HAVE_JPG)
-    if (image == NULL)
-        image = jpg_load(fp, image_path);
-#endif
-#if defined(WBG_HAVE_PNG)
-    if (image == NULL)
-        image = png_load(fp, image_path);
-#endif
-#if defined(WBG_HAVE_WEBP)
-    if (image == NULL)
-        image = webp_load(fp, image_path);
-#endif
-#if defined(WBG_HAVE_SVG)
-    if (image == NULL)
-        image = svg_load(fp, image_path);
-#endif
-#if defined(WBG_HAVE_JXL)
-    if (image == NULL)
-        image = jxl_load(fp, image_path);
-#endif
     if (image == NULL) {
         LOG_ERR("%s: failed to load", image_path);
         fclose(fp);
