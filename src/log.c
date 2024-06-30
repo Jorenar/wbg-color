@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier:  MIT
+ * Copyright 2020 Daniel Eklöf
+ */
+
 #include "log.h"
 
 #include <stdlib.h>

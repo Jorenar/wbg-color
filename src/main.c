@@ -1,3 +1,8 @@
+/* SPDX-License-Identifier:  MIT
+ * Copyright 2020-2024 Daniel Eklöf
+ * Copyright 2024      Jorengarenar
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

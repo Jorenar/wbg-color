@@ -1,3 +1,7 @@
+/* SPDX-License-Identifier:  MIT
+ * Copyright 2020-2024 Daniel Eklöf
+ */
+
 #include "shm.h"
 
 #include <assert.h>
