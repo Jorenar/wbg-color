@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier:  MIT
  * Copyright 2020-2024 Daniel Eklöf
+ * Copyright 2024      Jorengarenar
  */
 
 #include "shm.h"
@@ -27,8 +28,7 @@
  #define MFD_NOEXEC_SEAL 0
 #endif
 
-static void
-buffer_destroy(struct buffer *buf)
+static void buffer_destroy(struct buffer *buf)
 {
     pixman_image_unref(buf->pix);
     wl_buffer_destroy(buf->wl_buf);
@@ -36,8 +36,7 @@ buffer_destroy(struct buffer *buf)
     free(buf);
 }
 
-static void
-buffer_release(void *data, struct wl_buffer *wl_buffer)
+static void buffer_release(void *data, struct wl_buffer *wl_buffer)
 {
     struct buffer *buffer = data;
     buffer_destroy(buffer);
@@ -47,8 +46,7 @@ static const struct wl_buffer_listener buffer_listener = {
     .release = &buffer_release,
 };
 
-struct buffer *
-shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
+struct buffer *shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
 {
     /*
      * 1. open a memory backed "file" with memfd_create()
@@ -104,8 +102,7 @@ shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
     /* Seal file - we no longer allow any kind of resizing */
     /* TODO: wayland mmaps(PROT_WRITE), for some unknown reason, hence we cannot use F_SEAL_FUTURE_WRITE */
     if (fcntl(pool_fd, F_ADD_SEALS,
-              F_SEAL_GROW | F_SEAL_SHRINK | /*F_SEAL_FUTURE_WRITE |*/ F_SEAL_SEAL) < 0)
-    {
+              F_SEAL_GROW | F_SEAL_SHRINK | /*F_SEAL_FUTURE_WRITE |*/ F_SEAL_SEAL) < 0) {
         LOG_ERRNO("failed to seal SHM backing memory file");
         /* This is not a fatal error */
     }
@@ -124,8 +121,10 @@ shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
     }
 
     /* We use the entire pool for our single buffer */
-    wl_shm_pool_destroy(pool); pool = NULL;
-    close(pool_fd); pool_fd = -1;
+    wl_shm_pool_destroy(pool);
+    pool = NULL;
+    close(pool_fd);
+    pool_fd = -1;
 
     pix = pixman_image_create_bits_no_clear(
         PIXMAN_x8r8g8b8, width, height, mmapped, stride);
@@ -134,7 +133,7 @@ shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
         goto err;
     }
 
-    struct buffer *buffer = malloc(sizeof(*buffer));
+    struct buffer *buffer = malloc(sizeof (*buffer));
     *buffer = (struct buffer){
         .width = width,
         .height = height,
@@ -151,16 +150,21 @@ shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie)
     return buffer;
 
 err:
-    if (pix != NULL)
+    if (pix != NULL) {
         pixman_image_unref(pix);
-    if (buf != NULL)
+    }
+    if (buf != NULL) {
         wl_buffer_destroy(buf);
-    if (pool != NULL)
+    }
+    if (pool != NULL) {
         wl_shm_pool_destroy(pool);
-    if (pool_fd != -1)
+    }
+    if (pool_fd != -1) {
         close(pool_fd);
-    if (mmapped != NULL)
+    }
+    if (mmapped != NULL) {
         munmap(mmapped, size);
+    }
 
     return NULL;
 }

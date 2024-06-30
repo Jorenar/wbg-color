@@ -24,7 +24,7 @@ LIBS := pixman-1 wayland-client wayland-cursor
 
 WL_SCANNER = wayland-scanner
 
-CFLAGS   += -std=c18
+CFLAGS   += -std=c23
 CPPFLAGS += -D_POSIX_C_SOURCE -D_GNU_SOURCE
 CPPFLAGS += -I$(SRCDIR)
 CPPFLAGS += -I$(GENDIR)
