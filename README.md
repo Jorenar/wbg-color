@@ -1,4 +1,7 @@
-# Wbg
+wbg-color
+=========
+
+<!--
 
 Super simple wallpaper application for Wayland compositors
 implementing the layer-shell protocol.
@@ -65,3 +68,5 @@ Wbg is released under the [MIT license](LICENSE).
 
 Wbg (optionally) uses nanosvg, released under the [Zlib
 license](3rd-party/nanosvg/LICENSE.txt).
+
+-->
