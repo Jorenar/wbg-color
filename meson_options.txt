@@ -1,5 +1,0 @@
-option('png', type: 'feature')
-option('jpeg', type: 'feature')
-option('jxl', type: 'feature')
-option('webp', type: 'feature')
-option('svg', type: 'boolean')
