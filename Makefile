@@ -155,7 +155,9 @@ $(BINDIR)/%: $(OBJS)
 
 $(GENDIR)/version.h:
 	@mkdir -p $(GENDIR)
-	./generate-version.sh "" "" $@
+	printf '#define WBG_VERSION "%s"' \
+		$$(git describe --always --dirty --long) \
+		> $@
 
 $(GENDIR)/%.h: $(XMLS)
 	@mkdir -p $(GENDIR)
