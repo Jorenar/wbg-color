@@ -29,14 +29,11 @@
 #include "shm.h"
 #include "version.h"
 
-/* Top-level globals */
-static struct wl_display *display;
-static struct wl_registry *registry;
 static struct wl_compositor *compositor;
 static struct wl_shm *shm;
 static struct zwlr_layer_shell_v1 *layer_shell;
 
-static pixman_color_t color = {};
+static pixman_color_t color = { 0, 0, 0, 0xffff };
 
 static bool have_xrgb8888 = false;
 
@@ -47,7 +44,6 @@ struct output {
     char *make;
     char *model;
 
-    int scale;
     int width;
     int height;
 
@@ -64,10 +60,9 @@ static void render(struct output *output)
 {
     const int width = output->render_width;
     const int height = output->render_height;
-    const int scale = output->scale;
 
     struct buffer *buf = shm_get_buffer(
-        shm, width * scale, height * scale, (uintptr_t)(void *)output);
+        shm, width, height, (uintptr_t)(void *)output);
 
     if (buf == NULL) {
         return;
@@ -78,11 +73,12 @@ static void render(struct output *output)
     pixman_image_composite(
         PIXMAN_OP_SRC,
         fill, NULL, buf->pix, 0, 0, 0, 0, 0, 0,
-        width * scale, height * scale);
+        width, height);
 
-    wl_surface_set_buffer_scale(output->surf, scale);
+    pixman_image_unref(fill);
+
     wl_surface_attach(output->surf, buf->wl_buf, 0, 0);
-    wl_surface_damage_buffer(output->surf, 0, 0, width * scale, height * scale);
+    wl_surface_damage_buffer(output->surf, 0, 0, width, height);
     wl_surface_commit(output->surf);
 }
 
@@ -94,7 +90,6 @@ static void layer_surface_configure(void *data, struct zwlr_layer_surface_v1 *su
 
     /* If the size of the last committed buffer has not change, do not
      * render a new buffer because it will be identical to the old one. */
-    /* TODO: should we check the scale? */
     if (output->configured &&
         output->render_width == w &&
         output->render_height == h) {
@@ -185,27 +180,10 @@ static void output_done(void *data, struct wl_output *wl_output)
     struct output *output = data;
     const int width = output->width;
     const int height = output->height;
-    const int scale = output->scale;
 
-    LOG_INFO("output: %s %s (%dx%d, scale=%d)",
-             output->make, output->model, width, height, scale);
+    LOG_INFO("output: %s %s (%dx%d)",
+             output->make, output->model, width, height);
 }
-
-static void output_scale(void *data, struct wl_output *wl_output, int32_t factor)
-{
-    struct output *output = data;
-    output->scale = factor;
-    if (output->configured) {
-        render(output);
-    }
-}
-
-static const struct wl_output_listener output_listener = {
-    .geometry = &output_geometry,
-    .mode = &output_mode,
-    .done = &output_done,
-    .scale = &output_scale,
-};
 
 static void shm_format(void *data, struct wl_shm *wl_shm, uint32_t format)
 {
@@ -305,7 +283,6 @@ static void handle_global(void *data, struct wl_registry *registry,
         }));
 
         struct output *output = &tll_back(outputs);
-        wl_output_add_listener(wl_output, &output_listener, output);
         add_surface_to_output(output);
     } else if (strcmp(interface, zwlr_layer_shell_v1_interface.name) == 0) {
         const uint32_t required = 2;
@@ -355,27 +332,28 @@ static pixman_color_t parse_color(const char *hex_color)
 
 int main(int argc, const char *const *argv)
 {
-    if (argc < 2) {
-        fprintf(stderr, "error: missing required argument: image path\n");
-        return EXIT_FAILURE;
+    if (argc > 1) {
+        color = parse_color(argv[1]);
     }
 
     setlocale(LC_CTYPE, "");
     log_init(LOG_COLORIZE_AUTO, false, LOG_FACILITY_DAEMON, LOG_CLASS_WARNING);
-
-    color = parse_color(argv[1]);
 
     LOG_INFO("%s", WBG_VERSION);
 
     int exit_code = EXIT_FAILURE;
     int sig_fd = -1;
 
-    display = wl_display_connect(NULL);
+    struct wl_display *display = wl_display_connect(NULL);
     if (display == NULL) {
         LOG_ERR("failed to connect to wayland; no compositor running?");
         goto out;
     }
 
+    static struct wl_registry *registry; /* for some reason, without this
+                                          *   static, compiler warns about
+                                          *   uninitialized value...
+                                          */
     registry = wl_display_get_registry(display);
     if (registry == NULL) {
         LOG_ERR("failed to get wayland registry");
