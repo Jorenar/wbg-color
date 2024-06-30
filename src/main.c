@@ -33,9 +33,6 @@ static struct zwlr_layer_shell_v1 *layer_shell;
 
 static bool have_xrgb8888 = false;
 
-/* TODO: one per output */
-static pixman_image_t *image;
-
 struct output {
     struct wl_output *wl_output;
     uint32_t wl_name;
@@ -69,43 +66,13 @@ render(struct output *output)
     if (buf == NULL)
         return;
 
-    uint32_t *data = pixman_image_get_data(image);
-    int img_width = pixman_image_get_width(image);
-    int img_height = pixman_image_get_height(image);
-    int img_stride = pixman_image_get_stride(image);
-    pixman_format_code_t img_fmt = pixman_image_get_format(image);
+    pixman_color_t black = { 0, 0, 0, 0xffff };
+    pixman_image_t *fill = pixman_image_create_solid_fill(&black);
 
-    pixman_image_t *pix = pixman_image_create_bits_no_clear(
-        img_fmt, img_width, img_height, data, img_stride);
-
-    double sx = (double)img_width / (width * scale);
-    double sy = (double)img_height / (height * scale);
-
-    float s = sx > sy ? sy : sx;
-    sx = s;
-    sy = s;
-
-    float tx = (img_width / sx - width) / 2 / sx;
-    float ty = (img_height / sy - height) / 2 / sy;
-
-    pixman_f_transform_t t;
-    pixman_transform_t t2;
-    pixman_f_transform_init_translate(&t, tx, ty);
-    pixman_f_transform_init_scale(&t, sx, sy);
-    pixman_transform_from_pixman_f_transform(&t2, &t);
-    pixman_image_set_transform(pix, &t2);
-    pixman_image_set_filter(pix, PIXMAN_FILTER_BEST, NULL, 0);
-
-    pixman_image_composite32(
+    pixman_image_composite(
         PIXMAN_OP_SRC,
-        pix, NULL, buf->pix, 0, 0, 0, 0, 0, 0,
+        fill, NULL, buf->pix, 0, 0, 0, 0, 0, 0,
         width * scale, height * scale);
-
-    pixman_image_unref(pix);
-
-    LOG_INFO("render: %dx%d (scaled from %dx%d)",
-             width * scale, height * scale,
-             img_width, img_height);
 
     wl_surface_set_buffer_scale(output->surf, scale);
     wl_surface_attach(output->surf, buf->wl_buf, 0, 0);
@@ -371,30 +338,10 @@ static const struct wl_registry_listener registry_listener = {
 int
 main(int argc, const char *const *argv)
 {
-    if (argc < 2) {
-        fprintf(stderr, "error: missing required argument: image path\n");
-        return EXIT_FAILURE;
-    }
-
     setlocale(LC_CTYPE, "");
     log_init(LOG_COLORIZE_AUTO, false, LOG_FACILITY_DAEMON, LOG_CLASS_WARNING);
 
     LOG_INFO("%s", WBG_VERSION);
-
-    const char *image_path = argv[1];
-    image = NULL;
-
-    FILE *fp = fopen(image_path, "rb");
-    if (fp == NULL) {
-        LOG_ERRNO("%s: failed to open", image_path);
-        return EXIT_FAILURE;
-    }
-
-    if (image == NULL) {
-        LOG_ERR("%s: failed to load", image_path);
-        fclose(fp);
-        return EXIT_FAILURE;
-    }
 
     int exit_code = EXIT_FAILURE;
     int sig_fd = -1;
@@ -520,11 +467,6 @@ out:
         wl_registry_destroy(registry);
     if (display != NULL)
         wl_display_disconnect(display);
-    if (image != NULL) {
-        free(pixman_image_get_data(image));
-        pixman_image_unref(image);
-    }
     log_deinit();
-    fclose(fp);
     return exit_code;
 }
