@@ -36,6 +36,8 @@ static struct wl_compositor *compositor;
 static struct wl_shm *shm;
 static struct zwlr_layer_shell_v1 *layer_shell;
 
+static pixman_color_t color = {};
+
 static bool have_xrgb8888 = false;
 
 struct output {
@@ -71,8 +73,7 @@ render(struct output *output)
     if (buf == NULL)
         return;
 
-    pixman_color_t black = { 0, 0, 0, 0xffff };
-    pixman_image_t *fill = pixman_image_create_solid_fill(&black);
+    pixman_image_t *fill = pixman_image_create_solid_fill(&color);
 
     pixman_image_composite(
         PIXMAN_OP_SRC,
@@ -340,11 +341,36 @@ static const struct wl_registry_listener registry_listener = {
     .global_remove = &handle_global_remove,
 };
 
+static pixman_color_t parse_color(const char* hex_color)
+{
+    if (strlen(hex_color) != 7 || hex_color[0] != '#') {
+        // Invalid input format
+        return (pixman_color_t) { 0, 0, 0, 0xffff };
+    }
+
+    unsigned int r, g, b;
+    sscanf(hex_color + 1, "%02x%02x%02x", &r, &g, &b);
+
+    return (pixman_color_t){
+        .red   = (uint16_t)(r * 0x0101),
+        .green = (uint16_t)(g * 0x0101),
+        .blue  = (uint16_t)(b * 0x0101),
+        .alpha = 0xffff,
+    };
+}
+
 int
 main(int argc, const char *const *argv)
 {
+    if (argc < 2) {
+        fprintf(stderr, "error: missing required argument: image path\n");
+        return EXIT_FAILURE;
+    }
+
     setlocale(LC_CTYPE, "");
     log_init(LOG_COLORIZE_AUTO, false, LOG_FACILITY_DAEMON, LOG_CLASS_WARNING);
+
+    color = parse_color(argv[1]);
 
     LOG_INFO("%s", WBG_VERSION);
 
