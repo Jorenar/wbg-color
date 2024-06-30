@@ -1,76 +1,27 @@
 # Changelog
 
-* [Unreleased](#unreleased)
-* [1.2.0](#1-2-)
-* [1.1.0](#1-1-0)
+All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Unreleased]
 ### Added
 
-* Nanosvg updated to 93ce879dc4c04a3ef1758428ec80083c38610b1f
-* JPEG XL support ([#14][14])
-
-[14]: https://codeberg.org/dnkl/wbg/pulls/14
-
+* Makefile
 
 ### Changed
-### Deprecated
+
+* moved source files into src/ directory
+
 ### Removed
-### Fixed
 
-* Alpha not being applied correctly to PNG images.
-* Compilation error on musl libc ([#11][11]).
-
-[11]: https://codeberg.org/dnkl/wbg/issues/11
+* meson.build
 
 
-### Security
-### Contributors
+## [wbg]
 
-* Leonardo Hernández Hernández
+See [CHANGELOG.md of original wbg](https://codeberg.org/dnkl/wbg/src/commit/5fbfd76293e7ce2d189e6742f0a957e538d76036/CHANGELOG.md)
 
-
-## 1.2.0
-
-### Added
-
-* We now hint to the compositor that the background is fully opaque.
-* SVG support.
-
-
-### Changed
-
-* Image is now zoomed, rather than stretched ([#6][6]).
-
-[6]: https://codeberg.org/dnkl/wbg/issues/6
-
-
-### Fixed
-
-* Respect the `layer_surface::closed()` event.
-
-
-### Contributors
-
-* Leonardo Hernández Hernández
-* sewn
-
-
-## 1.1.0
-
-### Added
-
-* webp support
-
-
-### Fixed
-
-* meson: can’t use `SOURCE_DIR` in `custom_targets()`.
-* build: version script is now run in a C locale.
-* Don’t re-render frame on same-size configure events
-
-
-### Contributors
-
-*  Leonardo Hernández
+[unreleased]: https://github.com/Jorengarenar/wbg-color/compare/5fbfd76...HEAD
+[wbg]: https://codeberg.org/dnkl/wbg/src/commit/5fbfd76293e7ce2d189e6742f0a957e538d76036
