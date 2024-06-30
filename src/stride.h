@@ -3,7 +3,8 @@
  * Copyright 2024 Jorengarenar
  */
 
-#pragma once
+#ifndef STRIDE_H_
+#define STRIDE_H_
 
 #include <pixman.h>
 
@@ -11,3 +12,5 @@ static inline int stride_for_format_and_width(pixman_format_code_t format, int w
 {
     return (((PIXMAN_FORMAT_BPP(format) * width + 7) / 8 + 4 - 1) & -4);
 }
+
+#endif // STRIDE_H_

@@ -1,8 +1,10 @@
 /* SPDX-License-Identifier:  MIT
  * Copyright 2020 Daniel Eklöf
+ * Copyright 2024 Jorengarenar
  */
 
-#pragma once
+#ifndef SHM_H_
+#define SHM_H_
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -26,3 +28,5 @@ struct buffer {
 };
 
 struct buffer *shm_get_buffer(struct wl_shm *shm, int width, int height, unsigned long cookie);
+
+#endif // SHM_H_

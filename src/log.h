@@ -3,7 +3,9 @@
  * Copyright 2024 Jorengarenar
  */
 
-#pragma once
+#ifndef LOG_H_
+#define LOG_H_
+
 #include <stdbool.h>
 
 enum log_colorize { LOG_COLORIZE_NEVER, LOG_COLORIZE_ALWAYS, LOG_COLORIZE_AUTO };
@@ -45,3 +47,5 @@ void log_errno_provided(
 #else
  #define LOG_DBG(fmt, ...)
 #endif
+
+#endif // LOG_H_
