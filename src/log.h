@@ -1,51 +1,42 @@
 /* SPDX-License-Identifier:  MIT
- * Copyright 2020 Daniel Eklöf
  * Copyright 2024 Jorengarenar
  */
 
 #ifndef LOG_H_
 #define LOG_H_
 
-#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
-enum log_colorize { LOG_COLORIZE_NEVER, LOG_COLORIZE_ALWAYS, LOG_COLORIZE_AUTO };
-enum log_facility { LOG_FACILITY_USER, LOG_FACILITY_DAEMON };
-enum log_class { LOG_CLASS_ERROR, LOG_CLASS_WARNING, LOG_CLASS_INFO, LOG_CLASS_DEBUG };
+#include <ansi_esc_seq.h>
 
-void log_init(enum log_colorize colorize, bool do_syslog,
-              enum log_facility syslog_facility, enum log_class syslog_level);
-void log_deinit(void);
+#define LOG_FMT_COLOR(color) \
+    "[" color "%s" ANSI_RESET "] " ANSI_FG_GRAY "%s:%d: " ANSI_RESET
+#define LOG_FMT_PLAIN \
+    "[%s] %s:%d: "
 
-void log_msg(enum log_class log_class, const char *module,
-             const char *file, int lineno,
-             const char *fmt, ...) __attribute__((format (printf, 5, 6)));
+#define LOG_MSG(color, class, fmt, ...) \
+    do { \
+        fprintf(stderr, \
+                (isatty(STDERR_FILENO) ? LOG_FMT_COLOR(color) \
+                                       : LOG_FMT_PLAIN), \
+                class, __FILE__, __LINE__); \
+        fprintf(stderr, fmt, ## __VA_ARGS__); \
+        fprintf(stderr, "\n"); \
+    } while(0)
 
-void log_errno(enum log_class log_class, const char *module,
-               const char *file, int lineno,
-               const char *fmt, ...) __attribute__((format (printf, 5, 6)));
+#define LOG_ERR(fmt, ...)   LOG_MSG(ANSI_FG_RED,          "err",     fmt __VA_OPT__(,) __VA_ARGS__)
+#define LOG_WARN(fmt, ...)  LOG_MSG(ANSI_FG_YELLOW,       "warning", fmt __VA_OPT__(,) __VA_ARGS__)
+#define LOG_INFO(fmt, ...)  LOG_MSG(ANSI_FG_BRIGHT_WHITE, "info",    fmt __VA_OPT__(,) __VA_ARGS__)
 
-void log_errno_provided(
-    enum log_class log_class, const char *module,
-    const char *file, int lineno, int _errno,
-    const char *fmt, ...) __attribute__((format (printf, 6, 7)));
-
-#define LOG_ERR(fmt, ...)  \
-        log_msg(LOG_CLASS_ERROR, LOG_MODULE, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
 #define LOG_ERRNO(fmt, ...) \
-        log_errno(LOG_CLASS_ERROR, LOG_MODULE, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
-#define LOG_ERRNO_P(fmt, _errno, ...)                                   \
-        log_errno_provided(LOG_CLASS_ERROR, LOG_MODULE, __FILE__, __LINE__, \
-                           _errno, fmt, ## __VA_ARGS__)
-#define LOG_WARN(fmt, ...)  \
-        log_msg(LOG_CLASS_WARNING, LOG_MODULE, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
-#define LOG_INFO(fmt, ...)  \
-        log_msg(LOG_CLASS_INFO, LOG_MODULE, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
+    LOG_ERR(fmt __VA_OPT__(,) __VA_ARGS__); \
+    LOG_ERR("  errno: %s", strerror(errno))
 
 #if defined(LOG_ENABLE_DBG) && LOG_ENABLE_DBG
- #define LOG_DBG(fmt, ...)  \
-         log_msg(LOG_CLASS_DEBUG, LOG_MODULE, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
+#  define LOG_DBG(fmt, ...) LOG_MSG(ANSI_FG_CYAN, "debug", fmt __VA_OPT__(,) __VA_ARGS__)
 #else
- #define LOG_DBG(fmt, ...)
+#  define LOG_DBG(...)
 #endif
 
 #endif // LOG_H_

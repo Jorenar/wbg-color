@@ -6,3 +6,7 @@
 	path = extern/tllist
 	url = https://codeberg.org/dnkl/tllist.git
 	shallow = true
+[submodule "extern/ANSI_Esc_Seq"]
+	path = extern/ANSI_Esc_Seq
+	url = https://github.com/Jorengarenar/ANSI_Esc_Seq.git
+	shallow = true

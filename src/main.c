@@ -23,8 +23,6 @@
 #include <pixman.h>
 #include <tllist.h>
 
-#define LOG_MODULE "wbg"
-#define LOG_ENABLE_DBG 0
 #include "log.h"
 #include "shm.h"
 #include "version.h"
@@ -315,7 +313,7 @@ static const struct wl_registry_listener registry_listener = {
 static pixman_color_t parse_color(const char *hex_color)
 {
     if (strlen(hex_color) != 7 || hex_color[0] != '#') {
-        // Invalid input format
+        LOG_ERR("Invalid input format");
         return (pixman_color_t) { 0, 0, 0, 0xffff };
     }
 
@@ -337,7 +335,6 @@ int main(int argc, const char *const *argv)
     }
 
     setlocale(LC_CTYPE, "");
-    log_init(LOG_COLORIZE_AUTO, false, LOG_FACILITY_DAEMON, LOG_CLASS_WARNING);
 
     LOG_INFO("%s", WBG_VERSION);
 
@@ -478,7 +475,6 @@ out:
     if (display != NULL) {
         wl_display_disconnect(display);
     }
-    log_deinit();
 
     return exit_code;
 }

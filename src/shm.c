@@ -16,7 +16,6 @@
 
 #include <tllist.h>
 
-#define LOG_MODULE "shm"
 #include "log.h"
 #include "stride.h"
 
