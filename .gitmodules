@@ -2,3 +2,7 @@
 	path = extern/wlr-protocols
 	url = https://gitlab.freedesktop.org/wlroots/wlr-protocols.git
 	shallow = true
+[submodule "extern/tllist"]
+	path = extern/tllist
+	url = https://codeberg.org/dnkl/tllist.git
+	shallow = true

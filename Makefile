@@ -14,6 +14,7 @@ EXE := $(notdir $(CURDIR))
 
 SRCDIR   := src
 BUILD    := build
+EXTERN   := extern
 OBJDIR   := $(BUILD)/obj
 BINDIR   := $(BUILD)/bin
 DEPSDIR  := $(BUILD)/deps
@@ -28,7 +29,7 @@ CFLAGS   += -std=c2x
 CPPFLAGS += -D_POSIX_C_SOURCE -D_GNU_SOURCE
 CPPFLAGS += -I$(SRCDIR)
 CPPFLAGS += -I$(GENDIR)
-CPPFLAGS += -I3rd-party/nanosvg/src
+CPPFLAGS += -I$(EXTERN)/tllist
 
 LDFLAGS  +=
 LDLIBS   += -lm
@@ -41,7 +42,7 @@ OBJS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 WL_PROT_DATADIR := $(shell pkg-config --variable=pkgdatadir wayland-protocols)
 
 XMLS =
-XMLS += extern/wlr-protocols/unstable/wlr-layer-shell-unstable-v1.xml
+XMLS += $(EXTERN)/wlr-protocols/unstable/wlr-layer-shell-unstable-v1.xml
 XMLS += $(WL_PROT_DATADIR)/stable/xdg-shell/xdg-shell.xml
 
 PROTS = $(addprefix $(GENDIR)/, \
