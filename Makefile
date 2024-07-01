@@ -32,7 +32,7 @@ CPPFLAGS += -I$(GENDIR)
 CPPFLAGS += -I$(EXTERN)/tllist
 
 LDFLAGS  +=
-LDLIBS   += -lm
+LDLIBS   +=
 
 SANS += address bounds leak signed-integer-overflow undefined unreachable
 
