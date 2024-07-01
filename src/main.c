@@ -157,8 +157,8 @@ static void output_geometry(void *data, struct wl_output *wl_output, int32_t x, 
     free(output->make);
     free(output->model);
 
-    output->make = make != NULL ? strdup(make) : NULL;
-    output->model = model != NULL ? strdup(model) : NULL;
+    output->make = (make != NULL) ? strdup(make) : NULL;
+    output->model = (model != NULL) ? strdup(model) : NULL;
 }
 
 static void output_mode(void *data, struct wl_output *wl_output, uint32_t flags,
@@ -182,6 +182,18 @@ static void output_done(void *data, struct wl_output *wl_output)
     LOG_INFO("output: %s %s (%dx%d)",
              output->make, output->model, width, height);
 }
+
+static void output_scale(void*, struct wl_output*, int32_t)
+{
+    // scale is hardcoded to 1
+}
+
+static const struct wl_output_listener output_listener = {
+    .geometry = &output_geometry,
+    .mode = &output_mode,
+    .done = &output_done,
+    .scale = &output_scale,
+};
 
 static void shm_format(void *data, struct wl_shm *wl_shm, uint32_t format)
 {
@@ -281,6 +293,7 @@ static void handle_global(void *data, struct wl_registry *registry,
         }));
 
         struct output *output = &tll_back(outputs);
+        wl_output_add_listener(wl_output, &output_listener, output);
         add_surface_to_output(output);
     } else if (strcmp(interface, zwlr_layer_shell_v1_interface.name) == 0) {
         const uint32_t required = 2;
