@@ -1,0 +1,4 @@
+[submodule "extern/wlr-protocols"]
+	path = extern/wlr-protocols
+	url = https://gitlab.freedesktop.org/wlroots/wlr-protocols.git
+	shallow = true

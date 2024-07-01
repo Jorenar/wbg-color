@@ -40,9 +40,9 @@ OBJS := $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
 WL_PROT_DATADIR := $(shell pkg-config --variable=pkgdatadir wayland-protocols)
 
-XMLS = \
-	external/wlr-layer-shell-unstable-v1.xml \
-	$(WL_PROT_DATADIR)/stable/xdg-shell/xdg-shell.xml
+XMLS =
+XMLS += extern/wlr-protocols/unstable/wlr-layer-shell-unstable-v1.xml
+XMLS += $(WL_PROT_DATADIR)/stable/xdg-shell/xdg-shell.xml
 
 PROTS = $(addprefix $(GENDIR)/, \
 		   $(foreach file,$(XMLS), \
