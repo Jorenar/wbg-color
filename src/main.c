@@ -310,7 +310,7 @@ static void handle_global_remove(void *data, struct wl_registry *registry, uint3
 {
     tll_foreach(outputs, it) {
         if (it->item.wl_name == name) {
-            LOG_DBG("destroyed: %s %s", it->item.make, it->item.model);
+            LOG_DEBUG("destroyed: %s %s", it->item.make, it->item.model);
             output_destroy(&it->item);
             tll_remove(outputs, it);
             return;
