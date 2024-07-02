@@ -24,6 +24,7 @@ wbg-color is based on [wbg](https://codeberg.org/dnkl/wbg).
 ## Building
 
 ```sh
+$ git submodule update --init --recursive
 $ make
 ```
 
