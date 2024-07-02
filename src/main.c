@@ -329,7 +329,10 @@ static pixman_color_t parse_color(const char *hex_color)
         return (pixman_color_t) { 0, 0, 0, 0xffff };
     }
 
-    unsigned int r, g, b;
+    unsigned int r;
+    unsigned int g;
+    unsigned int b;
+
     sscanf(hex_color + 1, "%02x%02x%02x", &r, &g, &b);
 
     return (pixman_color_t){
