@@ -32,6 +32,9 @@ CPPFLAGS += -I$(GENDIR)
 CPPFLAGS += -I$(EXTERN)/tllist
 CPPFLAGS += -I$(EXTERN)/ANSI_Esc_Seq
 
+VERSION  := $(shell git describe --always --dirty --long)
+CPPFLAGS += -DWBG_VERSION='"$(VERSION)"'
+
 LDFLAGS  +=
 LDLIBS   +=
 
@@ -149,17 +152,11 @@ build: $(BINDIR)/$(EXE)
 
 # RULES ------------------------------------------------------------------- {{{1
 
-$(SRCS): $(GENDIR)/version.h $(PROTS_H)
+$(SRCS): $(PROTS_H)
 
 $(BINDIR)/%: $(OBJS)
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(LDLIBS)
-
-$(GENDIR)/version.h:
-	@mkdir -p $(GENDIR)
-	printf '#define WBG_VERSION "%s"' \
-		$$(git describe --always --dirty --long) \
-		> $@
 
 $(GENDIR)/%.h: $(XMLS)
 	@mkdir -p $(GENDIR)

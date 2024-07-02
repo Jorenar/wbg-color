@@ -25,7 +25,6 @@
 
 #include "log.h"
 #include "shm.h"
-#include "version.h"
 
 static struct wl_compositor *compositor;
 static struct wl_shm *shm;
@@ -349,7 +348,7 @@ int main(int argc, const char *const *argv)
 
     setlocale(LC_CTYPE, "");
 
-    LOG_INFO("%s", WBG_VERSION);
+    LOG_INFO("%s v%s", argv[0], WBG_VERSION);
 
     int exit_code = EXIT_FAILURE;
     int sig_fd = -1;
