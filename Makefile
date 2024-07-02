@@ -10,7 +10,7 @@ cache_build = @ echo "$@:" > $(BUILD)/.target
 
 # VARS -------------------------------------------------------------------- {{{1
 
-EXE := $(notdir $(CURDIR))
+EXE := wbg-color
 
 SRCDIR   := src
 BUILD    := build
