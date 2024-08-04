@@ -166,11 +166,10 @@ $(GENDIR)/%.c: $(XMLS)
 	@mkdir -p $(GENDIR)
 	$(WL_SCANNER) private-code $(filter %/$(notdir $(@:.c=.xml)),$(XMLS)) $@
 
-VPATH = $(GENDIR) $(SRCDIR)
-$(OBJDIR)/%.o: %.c
+$(OBJDIR)/%.o: $(SRCS)
 	@mkdir -p $(OBJDIR)
 	@mkdir -p $(DUMPDIR)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $(filter %/$(notdir $(@:.o=.c)),$(SRCS))
 
 $(DEPSDIR)/%.d: $(SRCDIR)/%.c
 	@mkdir -p $(DEPSDIR)
